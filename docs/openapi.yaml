@@ -1,0 +1,101 @@
+openapi: 3.0.0
+info:
+  title: URL Shortener API
+  version: 1.0.0
+  description: API for encoding and decoding URLs using a URL shortener service.
+
+paths:
+  /encode:
+    post:
+      summary: "Encode a URL into a short URL"
+      description: "This endpoint accepts a long URL and returns a shortened version of it."
+      operationId: encodeUrl
+      requestBody:
+        description: "URL to be shortened"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                originUrl:
+                  type: string
+                  format: uri
+                  example: "https://www.example.com"
+              required:
+                - originUrl
+      responses:
+        '200':
+          description: "Successfully shortened the URL"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  shortUrl:
+                    type: string
+                    example: "http://localhost:3000/abc123"
+        '400':
+          description: "Bad Request - Invalid URL"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "originUrl is not a valid URL"
+  
+  /decode:
+    get:
+      summary: "Decode a short URL into the original URL"
+      description: "This endpoint accepts a short URL and returns the original URL."
+      operationId: decodeUrl
+      parameters:
+        - name: shortUrl
+          in: query
+          required: true
+          description: "The shortened URL to decode"
+          schema:
+            type: string
+            example: "http://localhost:3000/abc123"
+      responses:
+        '200':
+          description: "Successfully decoded the short URL"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  originUrl:
+                    type: string
+                    format: uri
+                    example: "https://www.example.com"
+        '404':
+          description: "Not Found - The provided short URL does not exist"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "shortUrl not found"
+        '500':
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal server error"
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "originUrl is not a valid URL"
